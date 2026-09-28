@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LaunchGuard — Enterprise Wi-Fi 7 Access Point</title>
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg:           #f1f5f9;
+      --surface:      #ffffff;
+      --border:       #e2e8f0;
+      --header-bg:    #0f172a;
+      --header-text:  #f8fafc;
+      --text:         #1e293b;
+      --muted:        #64748b;
+      --accent:       #3b82f6;
+      --green:        #16a34a;
+      --green-bg:     #f0fdf4;
+      --green-border: #bbf7d0;
+      --amber:        #d97706;
+      --amber-bg:     #fffbeb;
+      --amber-border: #fde68a;
+      --red:          #dc2626;
+      --red-bg:       #fef2f2;
+      --red-border:   #fecaca;
+      --sev-critical: #7f1d1d;
+      --sev-critical-bg: #fef2f2;
+      --sev-critical-border: #f87171;
+      --sev-high:     #92400e;
+      --sev-high-bg:  #fff7ed;
+      --sev-high-border: #fdba74;
+      --sev-medium:   #78350f;
+      --sev-medium-bg: #fffbeb;
+      --sev-medium-border: #fcd34d;
+      --sev-low:      #1e3a5f;
+      --sev-low-bg:   #eff6ff;
+      --sev-low-border: #93c5fd;
+      --radius:       10px;
+      --shadow:       0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md:    0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── Header ────────────────────────────────────────────────────── */
+    .site-header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0 2rem;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-icon {
+      width: 38px; height: 38px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .brand-name { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand-tagline { font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
+    .header-meta { text-align: right; }
+    .product-name { font-size: 1rem; font-weight: 600; }
+    .launch-countdown {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: 0.3rem;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.35);
+      color: #fca5a5;
+      font-size: 0.78rem; font-weight: 600;
+      padding: 0.2rem 0.65rem;
+      border-radius: 20px;
+    }
+    .launch-countdown.countdown-ok {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.3);
+      color: #86efac;
+    }
+
+    /* ─── Insight Banner ────────────────────────────────────────────── */
+    .insight-banner {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+      border-bottom: 1px solid #334155;
+      padding: 0.75rem 2rem;
+    }
+    .insight-banner-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
+    .insight-banner strong { color: #e2e8f0; }
+
+    /* ─── Main Layout ───────────────────────────────────────────────── */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ─── Section Headers ───────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ─── Lifecycle Bar ─────────────────────────────────────────────── */
+    .lifecycle-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .lifecycle-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .lifecycle-step {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex: 1;
+      min-width: 0;
+    }
+    .lifecycle-label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 0.4rem 0.5rem;
+      white-space: nowrap;
+    }
+    .lifecycle-arrow {
+      color: #cbd5e1;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .lifecycle-step.step-active .lifecycle-label {
+      color: var(--accent);
+    }
+
+    /* ─── Summary Banner ────────────────────────────────────────────── */
+    .summary-banner {
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow);
+      border: 1px solid;
+      flex-wrap: wrap;
+    }
+    .summary-banner.has-critical {
+      background: var(--sev-critical-bg);
+      border-color: var(--sev-critical-border);
+    }
+    .summary-banner.has-high {
+      background: var(--sev-high-bg);
+      border-color: var(--sev-high-border);
+    }
+    .summary-banner.has-medium {
+      background: var(--sev-medium-bg);
+      border-color: var(--sev-medium-border);
+    }
+    .summary-banner.all-clear {
+      background: var(--green-bg);
+      border-color: var(--green-border);
+    }
+    .summary-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .summary-text h2 { font-size: 1rem; font-weight: 700; }
+    .summary-text p { font-size: 0.83rem; color: var(--muted); margin-top: 0.15rem; }
+    .summary-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto; }
+
+    /* ─── Grid ──────────────────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    /* ─── Team Cards Grid ───────────────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 860px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+
+    .team-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--border);
+      transition: border-left-color 0.2s;
+    }
+    .team-card.status-good  { border-left-color: var(--green); }
+    .team-card.status-warn  { border-left-color: var(--amber); }
+    .team-card.status-risk  { border-left-color: var(--red); }
+    .team-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+    .team-card-title {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.82rem; font-weight: 600; color: var(--text);
+    }
+    .team-icon { font-size: 1.1rem; }
+    .readiness-pct {
+      font-size: 1.3rem; font-weight: 800; line-height: 1;
+    }
+    .readiness-pct.pct-good  { color: var(--green); }
+    .readiness-pct.pct-warn  { color: var(--amber); }
+    .readiness-pct.pct-risk  { color: var(--red); }
+    .progress-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      margin: 0.5rem 0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.35s ease, background-color 0.2s;
+    }
+    .progress-fill.fill-good  { background: var(--green); }
+    .progress-fill.fill-warn  { background: var(--amber); }
+    .progress-fill.fill-risk  { background: var(--red); }
+    .team-status-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .team-status-label.lbl-good { color: var(--green); }
+    .team-status-label.lbl-warn { color: var(--amber); }
+    .team-status-label.lbl-risk { color: var(--red); }
+    .team-metric {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    /* ─── Risk Panel ────────────────────────────────────────────────── */
+    .risk-list { display: flex; flex-direction: column; gap: 1rem; }
+
+    .risk-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.3rem;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--border);
+      animation: fadeIn 0.25s ease;
+    }
+    .risk-card.sev-critical { border-left-color: #ef4444; }
+    .risk-card.sev-high     { border-left-color: #f97316; }
+    .risk-card.sev-medium   { border-left-color: #eab308; }
+    .risk-card.sev-low      { border-left-color: #3b82f6; }
+
+    .risk-card-header {
+      display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem;
+    }
+    .sev-badge {
+      flex-shrink: 0;
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .sev-badge.sev-critical {
+      color: var(--sev-critical); background: var(--sev-critical-bg); border-color: var(--sev-critical-border);
+    }
+    .sev-badge.sev-high {
+      color: var(--sev-high); background: var(--sev-high-bg); border-color: var(--sev-high-border);
+    }
+    .sev-badge.sev-medium {
+      color: var(--sev-medium); background: var(--sev-medium-bg); border-color: var(--sev-medium-border);
+    }
+    .sev-badge.sev-low {
+      color: var(--sev-low); background: var(--sev-low-bg); border-color: var(--sev-low-border);
+    }
+    .risk-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    .risk-rule-id { font-size: 0.7rem; color: var(--muted); margin-left: auto; flex-shrink: 0; }
+
+    .risk-body { margin-top: 0.2rem; }
+    .risk-label {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.2rem;
+    }
+    .risk-explanation {
+      font-size: 0.83rem; color: var(--text); margin-bottom: 0.7rem;
+      padding: 0.55rem 0.75rem;
+      background: #f8fafc;
+      border-radius: 6px;
+      border-left: 3px solid #e2e8f0;
+    }
+    .risk-recommendation {
+      font-size: 0.83rem; color: var(--text); margin-bottom: 0.75rem;
+      padding: 0.55rem 0.75rem;
+      background: #f0fdf4;
+      border-radius: 6px;
+      border-left: 3px solid #86efac;
+    }
+    .risk-teams {
+      display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-top: 0.5rem;
+    }
+    .risk-teams-label {
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--muted); margin-right: 0.2rem;
+    }
+    .team-chip {
+      font-size: 0.72rem; font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    /* ─── Empty State ───────────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius);
+    }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 700; color: var(--green); }
+    .empty-state p { font-size: 0.85rem; color: var(--muted); margin-top: 0.4rem; }
+
+    /* ─── What-If Simulator ─────────────────────────────────────────── */
+    .simulator-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .simulator-intro {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .sim-group-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      margin-top: 1rem;
+    }
+    .sim-group-label:first-of-type { margin-top: 0; }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .slider-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+    .slider-track {
+      flex: 1;
+      min-width: 0;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: 2px solid white;
+    }
+    .slider-value {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 70px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .reset-btn {
+      margin-top: 1.25rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--header-bg);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .reset-btn:hover { background: #1e293b; }
+
+    /* ─── Dependency Callout ────────────────────────────────────────── */
+    .dep-callout {
+      background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .dep-callout-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .dep-callout-text { font-size: 0.82rem; color: #1e3a5f; }
+    .dep-callout-text strong { color: #1e40af; }
+
+    /* ─── Animations ────────────────────────────────────────────────── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Footer ────────────────────────────────────────────────────── */
+    .site-footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div class="brand-name">LaunchGuard</div>
+        <div class="brand-tagline">Cross-functional launch risk detection</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="product-name">Enterprise Wi-Fi 7 Access Point</div>
+      <div id="countdown-badge" class="launch-countdown">⏱ Loading...</div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Insight Banner ──────────────────────────────────────────────── -->
+<div class="insight-banner">
+  <div class="insight-banner-inner">
+    ℹ️&nbsp;
+    <span>
+      <strong>LaunchGuard detects dependency conflicts between teams</strong> — 
+      not just low individual scores. A team can be 95% ready and still create a launch risk.
+    </span>
+  </div>
+</div>
+
+<!-- ─── Main ────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- Lifecycle -->
+  <div class="lifecycle-bar">
+    <div class="section-header" style="margin-bottom:0.6rem;">
+      <span class="section-title">Product Lifecycle Flow</span>
+    </div>
+    <div class="lifecycle-steps">
+      <div class="lifecycle-step"><span class="lifecycle-label">🏭 Vendor / Product</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">⚙️ Production</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">📦 Inventory</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">🤝 Channel / Resellers</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">📣 Marketing</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">💼 Sales</span></div>
+      <span class="lifecycle-arrow">›</span>
+      <div class="lifecycle-step"><span class="lifecycle-label">🎧 Support</span></div>
+    </div>
+  </div>
+
+  <!-- Dependency Callout -->
+  <div class="dep-callout">
+    <span class="dep-callout-icon">🔗</span>
+    <span class="dep-callout-text">
+      <strong>Why cross-functional risks are invisible in siloed dashboards:</strong>
+      Marketing may report 95% readiness while Inventory holds only 31% of expected demand.
+      Each team looks green individually — but the dependency between them creates a critical launch risk.
+      LaunchGuard evaluates <strong>relationships between teams</strong>, not just individual scores.
+    </span>
+  </div>
+
+  <!-- Summary Banner -->
+  <div id="summary-banner"></div>
+
+  <!-- Team Readiness -->
+  <div class="section-header">
+    <span class="section-title">Team Readiness</span>
+    <span style="font-size:0.75rem; color:var(--muted);">
+      🟢 ≥ 80%&nbsp;&nbsp;🟡 60–79%&nbsp;&nbsp;🔴 &lt; 60%
+    </span>
+  </div>
+  <div id="cards-grid" class="cards-grid"></div>
+
+  <!-- Two-col layout: Risks + Simulator -->
+  <div class="two-col">
+
+    <!-- Risk Panel -->
+    <div>
+      <div class="section-header">
+        <span class="section-title">Detected Cross-Functional Risks</span>
+      </div>
+      <div id="risk-list"></div>
+    </div>
+
+    <!-- What-If Simulator -->
+    <div>
+      <div class="section-header">
+        <span class="section-title">What-If Simulator</span>
+      </div>
+      <div class="simulator-panel">
+        <p class="simulator-intro">
+          Adjust any metric below and watch the risk analysis update live.
+          Risks appear and disappear as dependencies shift.
+        </p>
+
+        <div class="sim-group-label">📊 Demand &amp; Supply</div>
+        <div class="slider-row">
+          <span class="slider-label">Expected Demand (units)</span>
+          <div class="slider-track">
+            <input type="range" id="sl-demand" min="1000" max="20000" step="100" />
+          </div>
+          <span class="slider-value" id="val-demand">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Available Inventory (units)</span>
+          <div class="slider-track">
+            <input type="range" id="sl-inventory" min="0" max="20000" step="100" />
+          </div>
+          <span class="slider-value" id="val-inventory">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Production Capacity (units)</span>
+          <div class="slider-track">
+            <input type="range" id="sl-production" min="1000" max="20000" step="100" />
+          </div>
+          <span class="slider-value" id="val-production">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Support Capacity (customers)</span>
+          <div class="slider-track">
+            <input type="range" id="sl-support-cap" min="500" max="20000" step="100" />
+          </div>
+          <span class="slider-value" id="val-support-cap">—</span>
+        </div>
+
+        <div class="sim-group-label">✅ Quality &amp; Timeline</div>
+        <div class="slider-row">
+          <span class="slider-label">Quality Pass Rate (%)</span>
+          <div class="slider-track">
+            <input type="range" id="sl-quality" min="50" max="100" step="1" />
+          </div>
+          <span class="slider-value" id="val-quality">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Days to Launch</span>
+          <div class="slider-track">
+            <input type="range" id="sl-days" min="1" max="90" step="1" />
+          </div>
+          <span class="slider-value" id="val-days">—</span>
+        </div>
+
+        <div class="sim-group-label">👥 Team Readiness (%)</div>
+        <div class="slider-row">
+          <span class="slider-label">Marketing</span>
+          <div class="slider-track">
+            <input type="range" id="sl-marketing" min="0" max="100" step="1" />
+          </div>
+          <span class="slider-value" id="val-marketing">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Channel / Resellers</span>
+          <div class="slider-track">
+            <input type="range" id="sl-channel" min="0" max="100" step="1" />
+          </div>
+          <span class="slider-value" id="val-channel">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Sales</span>
+          <div class="slider-track">
+            <input type="range" id="sl-sales" min="0" max="100" step="1" />
+          </div>
+          <span class="slider-value" id="val-sales">—</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">Support</span>
+          <div class="slider-track">
+            <input type="range" id="sl-support" min="0" max="100" step="1" />
+          </div>
+          <span class="slider-value" id="val-support">—</span>
+        </div>
+
+        <button class="reset-btn" id="btn-reset">↺ Reset to Defaults</button>
+      </div>
+    </div>
+
+  </div><!-- /two-col -->
+
+</main>
+
+<!-- ─── Footer ──────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <strong>LaunchGuard</strong> — Catch cross-functional risk before it catches you
+</footer>
+
+<script>
+  /* ════════════════════════════════════════════════════════════════════
+     MOCK DATA LAYER
+  ════════════════════════════════════════════════════════════════════ */
+
+  const DEFAULT_SCENARIO = {
+    expectedDemand:      8000,
+    inventoryUnits:      2500,
+    productionCapacity:  6000,
+    supportCapacity:     3000,
+    qualityPassRate:     87,
+    daysToLaunch:        10
+  };
+
+  const DEFAULT_TEAMS = {
+    manufacturing: { name: 'Manufacturing',       icon: '⚙️',  readiness: 78,  metric: 'Production capacity: 6,000 units' },
+    quality:       { name: 'Quality Assurance',   icon: '🔬',  readiness: 87,  metric: 'Pass rate: 87%' },
+    inventory:     { name: 'Inventory',           icon: '📦',  readiness: 31,  metric: '2,500 of 8,000 units stocked' },
+    channel:       { name: 'Channel / Resellers', icon: '🤝',  readiness: 55,  metric: '55% of resellers onboarded' },
+    marketing:     { name: 'Marketing',           icon: '📣',  readiness: 95,  metric: 'Campaign fully activated' },
+    sales:         { name: 'Sales',               icon: '💼',  readiness: 58,  metric: '58% of sales team trained' },
+    support:       { name: 'Customer Support',    icon: '🎧',  readiness: 40,  metric: 'Support capacity: 3,000 customers' }
+  };
+
+  /* Working copies (mutated by simulator) */
+  let scenario = { ...DEFAULT_SCENARIO };
+  let teams    = JSON.parse(JSON.stringify(DEFAULT_TEAMS));
+
+  /* ════════════════════════════════════════════════════════════════════
+     RISK ENGINE
+  ════════════════════════════════════════════════════════════════════ */
+
+  function severityRank(s) {
+    return { critical: 0, high: 1, medium: 2, low: 3 }[s] ?? 99;
+  }
+
+  function sevIcon(s) {
+    return { critical: '⛔', high: '⚠️', medium: '🔶', low: 'ℹ️' }[s] ?? '';
+  }
+
+  function detectRisks(sc, t) {
+    const risks = [];
+
+    // R1 — Marketing vs Inventory
+    if (t.marketing.readiness >= 85 && sc.inventoryUnits < 0.4 * sc.expectedDemand) {
+      const pct = Math.round((sc.inventoryUnits / sc.expectedDemand) * 100);
+      risks.push({
+        id: 'R1', severity: 'high',
+        title: 'Inventory shortage vs. marketing demand signal',
+        explanation: `Marketing is ${t.marketing.readiness}% ready and will drive demand for ${sc.expectedDemand.toLocaleString()} units, but only ${sc.inventoryUnits.toLocaleString()} units are available — ${pct}% of projected demand. Customers who respond to the campaign will face out-of-stock situations, damaging brand reputation at the exact moment of peak intent.`,
+        recommendation: 'Delay campaign activation or expedite production and logistics to close the inventory gap before launch.',
+        affectedTeams: ['Marketing', 'Inventory']
+      });
+    }
+
+    // R2 — Marketing vs Sales
+    if (t.marketing.readiness >= 85 && t.sales.readiness < 60) {
+      risks.push({
+        id: 'R2', severity: 'high',
+        title: 'Sales team not ready for marketing-generated leads',
+        explanation: `Marketing is ${t.marketing.readiness}% ready and will generate a high volume of inbound leads, but the Sales team is only ${t.sales.readiness}% ready. Qualified leads generated by the campaign will not be converted — wasting marketing spend and missing the launch revenue window.`,
+        recommendation: 'Accelerate sales training and enablement, or scale back marketing spend until sales readiness reaches ≥ 75%.',
+        affectedTeams: ['Marketing', 'Sales']
+      });
+    }
+
+    // R3 — Demand vs Support Capacity
+    if (sc.expectedDemand > 2 * sc.supportCapacity) {
+      const ratio = (sc.expectedDemand / sc.supportCapacity).toFixed(1);
+      risks.push({
+        id: 'R3', severity: 'high',
+        title: 'Support capacity overwhelmed by expected demand volume',
+        explanation: `Expected demand of ${sc.expectedDemand.toLocaleString()} units is ${ratio}× the support team's capacity of ${sc.supportCapacity.toLocaleString()} concurrent customers. New enterprise Wi-Fi 7 deployments require significant onboarding support. Inadequate support capacity will result in long wait times, negative reviews, and elevated churn.`,
+        recommendation: 'Expand support capacity through hiring, partner support, or tiered self-service resources before launch.',
+        affectedTeams: ['Support', 'Sales']
+      });
+    }
+
+    // R4 — Quality vs Launch Timeline (Critical)
+    if (sc.qualityPassRate < 90 && sc.daysToLaunch <= 14) {
+      risks.push({
+        id: 'R4', severity: 'critical',
+        title: 'Quality below threshold with imminent launch date',
+        explanation: `The quality pass rate is ${sc.qualityPassRate}% — below the 90% minimum threshold — and launch is only ${sc.daysToLaunch} day${sc.daysToLaunch === 1 ? '' : 's'} away. There is not enough time to remediate defects and re-validate units before they reach customers. Shipping below-threshold units will drive elevated return rates, higher support ticket volumes at exactly the moment capacity is most constrained, and negative early reviews that are difficult to recover from once the launch window has passed.`,
+        recommendation: 'Do not launch until quality pass rate exceeds 90%, or immediately escalate to engineering to triage the most critical failure modes.',
+        affectedTeams: ['Quality', 'Manufacturing', 'Support']
+      });
+    }
+
+    // R5 — Production Capacity vs Demand
+    if (sc.productionCapacity < sc.expectedDemand) {
+      const gap = (sc.expectedDemand - sc.productionCapacity).toLocaleString();
+      risks.push({
+        id: 'R5', severity: 'high',
+        title: 'Production capacity below expected demand',
+        explanation: `Production capacity is capped at ${sc.productionCapacity.toLocaleString()} units but expected demand is ${sc.expectedDemand.toLocaleString()} units — a shortfall of ${gap} units. Even with perfect inventory levels today, the production line cannot replenish stock fast enough to sustain launch momentum.`,
+        recommendation: 'Engage contract manufacturing capacity or implement demand-shaping strategies (waitlists, tiered release) to manage the gap.',
+        affectedTeams: ['Manufacturing', 'Inventory', 'Sales']
+      });
+    }
+
+    // R6 — Sales vs Support
+    if (t.sales.readiness >= 80 && t.support.readiness < 60) {
+      risks.push({
+        id: 'R6', severity: 'medium',
+        title: 'Support team lagging behind sales readiness',
+        explanation: `Sales is ${t.sales.readiness}% ready and will close deals quickly, but Customer Support is only ${t.support.readiness}% ready. Customers who purchase through well-trained sales reps will immediately encounter an under-prepared support organisation, creating a sharp post-sale experience drop.`,
+        recommendation: 'Prioritise support team training, knowledge-base completion, and escalation procedures before sales reps reach full capacity.',
+        affectedTeams: ['Sales', 'Support']
+      });
+    }
+
+    // R7 — Overstock
+    if (sc.inventoryUnits > 3 * sc.expectedDemand) {
+      const excess = (sc.inventoryUnits - sc.expectedDemand).toLocaleString();
+      risks.push({
+        id: 'R7', severity: 'medium',
+        title: 'Inventory significantly exceeds expected demand',
+        explanation: `Inventory of ${sc.inventoryUnits.toLocaleString()} units is more than 3× the expected demand of ${sc.expectedDemand.toLocaleString()} units. An excess of ${excess} units ties up working capital, risks obsolescence in a fast-moving Wi-Fi standards cycle, and may indicate a demand forecast misalignment.`,
+        recommendation: 'Review demand forecasts and consider reducing production orders, offering channel incentives to accelerate velocity, or planning a secondary market strategy.',
+        affectedTeams: ['Inventory', 'Marketing', 'Sales']
+      });
+    }
+
+    // R8 — Marketing vs Channel
+    if (t.marketing.readiness >= 85 && t.channel.readiness < 70) {
+      risks.push({
+        id: 'R8', severity: 'high',
+        title: 'Channel partners not ready for marketing-driven demand',
+        explanation: `Marketing is ${t.marketing.readiness}% ready and will create end-customer pull-through demand, but only ${t.channel.readiness}% of resellers and channel partners are onboarded and trained. Enterprise customers who respond to marketing campaigns will contact resellers who cannot yet position, quote, or fulfil the product.`,
+        recommendation: 'Accelerate reseller onboarding, certification, and deal-registration training before the marketing campaign goes live.',
+        affectedTeams: ['Marketing', 'Channel / Resellers']
+      });
+    }
+
+    return risks.sort((a, b) => severityRank(a.severity) - severityRank(b.severity));
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     RENDERING
+  ════════════════════════════════════════════════════════════════════ */
+
+  function readinessClass(pct) {
+    if (pct >= 80) return 'good';
+    if (pct >= 60) return 'warn';
+    return 'risk';
+  }
+
+  function readinessLabel(pct) {
+    if (pct >= 80) return 'Ready';
+    if (pct >= 60) return 'At Risk';
+    return 'Not Ready';
+  }
+
+  function renderTeamCards(t) {
+    const grid = document.getElementById('cards-grid');
+    grid.innerHTML = Object.entries(t).map(([slug, team]) => {
+      const cls = readinessClass(team.readiness);
+      const lbl = readinessLabel(team.readiness);
+      return `
+        <div class="team-card status-${cls}">
+          <div class="team-card-header">
+            <div class="team-card-title">
+              <span class="team-icon">${team.icon}</span>
+              <span>${team.name}</span>
+            </div>
+            <span class="readiness-pct pct-${cls}">${team.readiness}%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fill-${cls}" style="width:${team.readiness}%"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="team-status-label lbl-${cls}">${lbl}</span>
+          </div>
+          <div class="team-metric">${team.metric}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderRiskPanel(risks) {
+    const el = document.getElementById('risk-list');
+    if (risks.length === 0) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">✅</div>
+          <h3>No cross-functional risks detected</h3>
+          <p>All team readiness levels and supply metrics are aligned.<br>
+             The launch is cleared to proceed.</p>
+        </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="risk-list">${risks.map(r => `
+      <div class="risk-card sev-${r.severity}">
+        <div class="risk-card-header">
+          <span class="sev-badge sev-${r.severity}">${sevIcon(r.severity)} ${r.severity.toUpperCase()}</span>
+          <span class="risk-title">${r.title}</span>
+          <span class="risk-rule-id">${r.id}</span>
+        </div>
+        <div class="risk-body">
+          <div class="risk-label">Why this risk exists</div>
+          <div class="risk-explanation">${r.explanation}</div>
+          <div class="risk-label">Recommended action</div>
+          <div class="risk-recommendation">→ ${r.recommendation}</div>
+          <div class="risk-teams">
+            <span class="risk-teams-label">Affected teams</span>
+            ${r.affectedTeams.map(t => `<span class="team-chip">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  function renderSummaryBanner(risks) {
+    const el = document.getElementById('summary-banner');
+    if (risks.length === 0) {
+      el.innerHTML = `
+        <div class="summary-banner all-clear" style="margin-bottom:2rem;">
+          <span class="summary-icon">✅</span>
+          <div class="summary-text">
+            <h2>Launch Cleared — No Cross-Functional Risks</h2>
+            <p>All dependency checks passed. Teams are aligned for a successful launch.</p>
+          </div>
+        </div>`;
+      return;
+    }
+    const worst = risks[0].severity;
+    const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+    risks.forEach(r => counts[r.severity]++);
+    const badges = Object.entries(counts)
+      .filter(([, c]) => c > 0)
+      .map(([s, c]) => `<span class="sev-badge sev-${s}">${sevIcon(s)} ${c} ${s}</span>`)
+      .join('');
+    const worstLabel = {
+      critical: 'Critical Risks Detected — Launch At Risk',
+      high: 'High Risks Detected — Launch at Risk',
+      medium: 'Medium Risks Detected — Review Recommended',
+      low: 'Low-Level Risks — Monitor Before Launch'
+    }[worst];
+    const desc = {
+      critical: 'One or more critical cross-functional dependency failures require immediate resolution before any launch activity.',
+      high: 'High-severity dependency conflicts will compromise launch outcomes. Resolution required before proceeding.',
+      medium: 'Medium-severity risks identified. Address before launch to protect customer experience and revenue targets.',
+      low: 'Minor misalignments detected. Review and monitor but launch may proceed.'
+    }[worst];
+    el.innerHTML = `
+      <div class="summary-banner has-${worst}" style="margin-bottom:2rem;">
+        <span class="summary-icon">${sevIcon(worst)}</span>
+        <div class="summary-text">
+          <h2>${worstLabel}</h2>
+          <p>${desc}</p>
+        </div>
+        <div class="summary-badges">${badges}</div>
+      </div>`;
+  }
+
+  function updateCountdown(days) {
+    const badge = document.getElementById('countdown-badge');
+    badge.textContent = `⏱ ${days} day${days === 1 ? '' : 's'} to launch`;
+    if (days <= 14) {
+      badge.classList.remove('countdown-ok');
+    } else {
+      badge.classList.add('countdown-ok');
+    }
+  }
+
+  function renderAll() {
+    const risks = detectRisks(scenario, teams);
+    renderTeamCards(teams);
+    renderRiskPanel(risks);
+    renderSummaryBanner(risks);
+    updateCountdown(scenario.daysToLaunch);
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     WHAT-IF SIMULATOR
+  ════════════════════════════════════════════════════════════════════ */
+
+  const SLIDERS = [
+    { id: 'sl-demand',      valId: 'val-demand',      fmt: v => v.toLocaleString() + ' units',
+      get: () => scenario.expectedDemand,
+      set: v => { scenario.expectedDemand = v; } },
+    { id: 'sl-inventory',   valId: 'val-inventory',   fmt: v => v.toLocaleString() + ' units',
+      get: () => scenario.inventoryUnits,
+      set: v => { scenario.inventoryUnits = v;
+                  teams.inventory.readiness = Math.min(100, Math.round((v / scenario.expectedDemand) * 100));
+                  teams.inventory.metric = `${v.toLocaleString()} of ${scenario.expectedDemand.toLocaleString()} units stocked`; } },
+    { id: 'sl-production',  valId: 'val-production',  fmt: v => v.toLocaleString() + ' units',
+      get: () => scenario.productionCapacity,
+      set: v => { scenario.productionCapacity = v;
+                  teams.manufacturing.metric = `Production capacity: ${v.toLocaleString()} units`; } },
+    { id: 'sl-support-cap', valId: 'val-support-cap', fmt: v => v.toLocaleString() + ' customers',
+      get: () => scenario.supportCapacity,
+      set: v => { scenario.supportCapacity = v;
+                  teams.support.metric = `Support capacity: ${v.toLocaleString()} customers`; } },
+    { id: 'sl-quality',     valId: 'val-quality',     fmt: v => v + '%',
+      get: () => scenario.qualityPassRate,
+      set: v => { scenario.qualityPassRate = v;
+                  teams.quality.readiness = v;
+                  teams.quality.metric = `Pass rate: ${v}%`; } },
+    { id: 'sl-days',        valId: 'val-days',        fmt: v => v + (v === 1 ? ' day' : ' days'),
+      get: () => scenario.daysToLaunch,
+      set: v => { scenario.daysToLaunch = v; } },
+    { id: 'sl-marketing',   valId: 'val-marketing',   fmt: v => v + '%',
+      get: () => teams.marketing.readiness,
+      set: v => { teams.marketing.readiness = v; } },
+    { id: 'sl-channel',     valId: 'val-channel',     fmt: v => v + '%',
+      get: () => teams.channel.readiness,
+      set: v => { teams.channel.readiness = v;
+                  teams.channel.metric = `${v}% of resellers onboarded`; } },
+    { id: 'sl-sales',       valId: 'val-sales',       fmt: v => v + '%',
+      get: () => teams.sales.readiness,
+      set: v => { teams.sales.readiness = v;
+                  teams.sales.metric = `${v}% of sales team trained`; } },
+    { id: 'sl-support',     valId: 'val-support',     fmt: v => v + '%',
+      get: () => teams.support.readiness,
+      set: v => { teams.support.readiness = v; } }
+  ];
+
+  function syncSlidersToState() {
+    SLIDERS.forEach(sl => {
+      const el = document.getElementById(sl.id);
+      const val = sl.get();
+      el.value = val;
+      document.getElementById(sl.valId).textContent = sl.fmt(val);
+    });
+  }
+
+  function initSimulator() {
+    syncSlidersToState();
+    SLIDERS.forEach(sl => {
+      document.getElementById(sl.id).addEventListener('input', function () {
+        const v = parseInt(this.value, 10);
+        sl.set(v);
+        document.getElementById(sl.valId).textContent = sl.fmt(v);
+        // Recalculate inventory readiness pct whenever demand changes
+        if (sl.id === 'sl-demand') {
+          teams.inventory.readiness = Math.min(100, Math.round((scenario.inventoryUnits / v) * 100));
+          teams.inventory.metric = `${scenario.inventoryUnits.toLocaleString()} of ${v.toLocaleString()} units stocked`;
+        }
+        renderAll();
+      });
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      scenario = { ...DEFAULT_SCENARIO };
+      teams    = JSON.parse(JSON.stringify(DEFAULT_TEAMS));
+      syncSlidersToState();
+      renderAll();
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════════
+     BOOTSTRAP
+  ════════════════════════════════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    initSimulator();
+    renderAll();
+  });
+</script>
+</body>
+</html>
